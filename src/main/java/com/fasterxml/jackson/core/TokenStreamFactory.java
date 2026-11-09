@@ -19,6 +19,13 @@ public abstract class TokenStreamFactory
 {
     private static final long serialVersionUID = 2;
 
+    /**
+     * Optional StreamReadConfig.
+     *
+     * @since 2.15
+     */
+    protected StreamReadConstraints _streamReadConstraints;
+
     /*
     /**********************************************************************
     /* Capability introspection

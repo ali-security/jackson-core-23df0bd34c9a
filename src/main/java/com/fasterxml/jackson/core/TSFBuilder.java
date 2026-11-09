@@ -76,6 +76,13 @@ public abstract class TSFBuilder<F extends JsonFactory,
      * additional processing on output during content generation.
      */
     protected OutputDecorator _outputDecorator;
+
+    /**
+     * Optional StreamReadConfig.
+     *
+     * @since 2.15
+     */
+    protected StreamReadConstraints _streamReadConstraints;
     
     /*
     /**********************************************************************
@@ -95,6 +102,7 @@ public abstract class TSFBuilder<F extends JsonFactory,
     {
         this(base._factoryFeatures,
                 base._parserFeatures, base._generatorFeatures);
+        _streamReadConstraints = base._streamReadConstraints;
     }
 
     protected TSFBuilder(int factoryFeatures,
@@ -259,6 +267,18 @@ public abstract class TSFBuilder<F extends JsonFactory,
 
     public B outputDecorator(OutputDecorator dec) {
         _outputDecorator = dec;
+        return _this();
+    }
+
+    /**
+     * Sets the constraints for streaming reads.
+     *
+     * @param streamReadConstraints constraints for streaming reads
+     * @return this factory
+     * @since 2.15
+     */
+    public B streamReadConstraints(StreamReadConstraints streamReadConstraints) {
+        _streamReadConstraints = streamReadConstraints;
         return _this();
     }
 
