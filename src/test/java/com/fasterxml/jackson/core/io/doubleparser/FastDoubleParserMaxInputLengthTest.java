@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 public class FastDoubleParserMaxInputLengthTest {
     @TestFactory
-    @Disabled
+    @Disabled("Disabled upstream: parses CharSequence inputs of length Integer.MAX_VALUE (2^31-1 chars of leading whitespace), too slow for routine CI")
     List<DynamicNode> dynamicTestsIllegalMaxLengthInputs() {
         return Arrays.asList(
                 dynamicTest("empty", () -> testIllegalMaxLengthInput("")),
@@ -42,7 +42,7 @@ public class FastDoubleParserMaxInputLengthTest {
     }
 
     @TestFactory
-    @Disabled
+    @Disabled("Disabled upstream: parses CharSequence inputs of length Integer.MAX_VALUE (2^31-1 chars of leading whitespace), too slow for routine CI")
     List<DynamicNode> dynamicTestsLegalDecFloatMaxLengthLiterals() {
         return Arrays.asList(
                 dynamicTest("1e23", () -> testLegalMaxLengthInput("1e23", 1e23)),

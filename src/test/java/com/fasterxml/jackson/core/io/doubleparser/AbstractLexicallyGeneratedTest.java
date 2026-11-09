@@ -47,7 +47,7 @@ abstract class AbstractLexicallyGeneratedTest {
     public static final long SEED = System.nanoTime();
 
     @TestFactory
-    @Disabled
+    @Disabled("Disabled upstream: exploratory fuzzing with a random System.nanoTime() seed (non-reproducible); per class javadoc enable only to discover new test cases")
     Stream<DynamicTest> dynamicTestsRandomStringFrom1SyntaxRuleWithoutWhitespace() {
         Random rng = new Random(SEED);
         LexicalGenerator gen = new LexicalGenerator(false, true);
@@ -60,7 +60,7 @@ abstract class AbstractLexicallyGeneratedTest {
     }
 
     @TestFactory
-    @Disabled
+    @Disabled("Disabled upstream: exploratory fuzzing with a random System.nanoTime() seed (non-reproducible); per class javadoc enable only to discover new test cases")
     Stream<DynamicTest> dynamicTestsRandomStringFrom2SyntaxRuleWithoutWhitespace() {
         Random rng = new Random(SEED);
         LexicalGenerator gen = new LexicalGenerator(false, true);
@@ -73,7 +73,7 @@ abstract class AbstractLexicallyGeneratedTest {
     }
 
     @TestFactory
-    @Disabled
+    @Disabled("Disabled upstream: exploratory fuzzing with a random System.nanoTime() seed (non-reproducible); per class javadoc enable only to discover new test cases")
     Stream<DynamicTest> dynamicTestsRandomStringFrom3SyntaxRuleWithoutWhitespace() {
         Random rng = new Random(SEED);
         LexicalGenerator gen = new LexicalGenerator(false, true);
@@ -86,7 +86,7 @@ abstract class AbstractLexicallyGeneratedTest {
     }
 
     @TestFactory
-    @Disabled
+    @Disabled("Disabled upstream: exploratory fuzzing with a random System.nanoTime() seed (non-reproducible); per class javadoc enable only to discover new test cases")
     Stream<DynamicTest> dynamicTestsRandomStringFrom4SyntaxRuleWithoutWhitespace() {
         Random rng = new Random(SEED);
         LexicalGenerator gen = new LexicalGenerator(false, true);
@@ -99,7 +99,7 @@ abstract class AbstractLexicallyGeneratedTest {
     }
 
     @TestFactory
-    @Disabled
+    @Disabled("Disabled upstream: exploratory fuzzing with a random System.nanoTime() seed (non-reproducible); per class javadoc enable only to discover new test cases")
     Stream<DynamicTest> dynamicTestsRandomStringFrom10SyntaxRuleWithoutWhitespace() {
         Random rng = new Random(SEED);
         LexicalGenerator gen = new LexicalGenerator(false, true);
@@ -112,7 +112,7 @@ abstract class AbstractLexicallyGeneratedTest {
     }
 
     @TestFactory
-    @Disabled
+    @Disabled("Disabled upstream: exploratory fuzzing with a random System.nanoTime() seed (non-reproducible); per class javadoc enable only to discover new test cases")
     Stream<DynamicTest> dynamicTestsRandomStringsOfIncreasingLengthWithWhitespace() {
         Random rng = new Random(SEED);
         LexicalGenerator gen = new LexicalGenerator(false, true);
@@ -125,7 +125,7 @@ abstract class AbstractLexicallyGeneratedTest {
     }
 
     @TestFactory
-    @Disabled
+    @Disabled("Disabled upstream: exploratory fuzzing with a random System.nanoTime() seed (non-reproducible); per class javadoc enable only to discover new test cases")
     Stream<DynamicNode> dynamicTestsAsciiCharacterInputsUpTo4Characters() {
         int maxLength = 4;
         Random rng = new Random();

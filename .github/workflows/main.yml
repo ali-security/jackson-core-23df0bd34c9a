@@ -1,33 +1,24 @@
 name: Build and Deploy Snapshot
 on:
-  push:
-    branches:
-    - master
-    - "3.0"
-    - "2.14"
-    paths-ignore:
-    - "README.md"
-    - "release-notes/*"
-  pull_request:
-    branches:
-    - master
-    - "3.0"
-    - "2.14"
-    paths-ignore:
-    - "README.md"
-    - "release-notes/*"
+  workflow_dispatch:
+    inputs:
+      test-filter:
+        description: 'Optional surefire -Dtest selector (empty = full suite)'
+        required: false
+        default: ''
 permissions:
   contents: read
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
         # As of Jackson 2.14 got Java 8 baseline so can build on later JDKs too
         java_version: ['8', '11', '17']
-        os: ['ubuntu-20.04']
+        os: ['ubuntu-latest']
     env:
       JAVA_OPTS: "-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
     steps:
@@ -45,7 +36,50 @@ jobs:
         # gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Value of the GPG private key to import
         # gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
     - name: Build
-      run: ./mvnw -B -q -ff -ntp verify
+      shell: bash
+      env:
+        FILTER: ${{ inputs.test-filter }}
+      run: |
+        if [ -n "$FILTER" ]; then
+          ./mvnw -B -q -ff -ntp verify "-Dtest=${FILTER// /,}" -DfailIfNoTests=false -Dsurefire.failIfNoSpecifiedTests=false
+        else
+          ./mvnw -B -q -ff -ntp verify
+        fi
+    - name: Surefire test summary
+      if: always()
+      shell: bash
+      run: |
+        python3 - <<'EOF'
+        import glob, xml.etree.ElementTree as ET
+        tot = fail = err = skip = 0
+        notes = []
+        for f in sorted(glob.glob('target/surefire-reports/TEST-*.xml')):
+            r = ET.parse(f).getroot()
+            t, fl, e, s = (int(r.get(k, 0)) for k in ('tests', 'failures', 'errors', 'skipped'))
+            tot += t; fail += fl; err += e; skip += s
+            reasons = []
+            for tc in r.iter('testcase'):
+                for kind in ('skipped', 'failure', 'error'):
+                    el = tc.find(kind)
+                    if el is not None:
+                        msg = el.get('message') or '(no message)'
+                        notes.append(f"{kind.upper()}: {tc.get('classname')}.{tc.get('name')} -- reason: {msg}")
+                        if kind == 'skipped' and msg not in reasons:
+                            reasons.append(msg)
+            why = f" (skip reason: {'; '.join(reasons)})" if reasons else ''
+            print(f"{r.get('name')}: Tests run: {t}, Failures: {fl}, Errors: {e}, Skipped: {s}{why}")
+        print(f"TEST SUMMARY: Tests run: {tot}, Passed: {tot - fail - err - skip}, Failures: {fail}, Errors: {err}, Skipped: {skip}")
+        print(f"Skipped/failed tests with reasons ({len(notes)}):")
+        for n in notes:
+            print(f"  {n}")
+        EOF
+    - name: Upload jar
+      if: matrix.java_version == '8'
+      uses: actions/upload-artifact@v4
+      with:
+        name: jackson-core-jar
+        path: target/jackson-core-*[0-9].jar
+        if-no-files-found: error
     - name: Extract project Maven version
       id: projectVersion
       run: echo "version=$(./mvnw org.apache.maven.plugins:maven-help-plugin:3.3.0:evaluate -DforceStdout -Dexpression=project.version -q)" >>$GITHUB_OUTPUT
@@ -53,7 +87,7 @@ jobs:
       if: matrix.java_version == '8'
       run: ./mvnw -B -q -ff -ntp -DskipTests animal-sniffer:check
     - name: Deploy snapshot
-      if: github.event_name != 'pull_request' && matrix.java_version == '8' && endsWith(steps.projectVersion.outputs.version, '-SNAPSHOT')
+      if: false && github.event_name != 'pull_request' && matrix.java_version == '8' && endsWith(steps.projectVersion.outputs.version, '-SNAPSHOT')
       env:
         CI_DEPLOY_USERNAME: ${{ secrets.CI_DEPLOY_USERNAME }}
         CI_DEPLOY_PASSWORD: ${{ secrets.CI_DEPLOY_PASSWORD }}
@@ -63,7 +97,7 @@ jobs:
       if: github.event_name != 'pull_request' && matrix.java_version == '8'
       run: ./mvnw -B -q -ff -ntp test
     - name: Publish code coverage
-      if: github.event_name != 'pull_request' && matrix.java_version == '8'
+      if: false && github.event_name != 'pull_request' && matrix.java_version == '8'
       uses: codecov/codecov-action@v3
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
