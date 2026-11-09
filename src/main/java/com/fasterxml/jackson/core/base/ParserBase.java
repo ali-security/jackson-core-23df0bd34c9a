@@ -151,6 +151,11 @@ public abstract class ParserBase extends ParserMinimalBase
     protected final TextBuffer _textBuffer;
 
     /**
+     * @since 2.15
+     */
+    protected final StreamReadConstraints _streamReadConstraints;
+
+    /**
      * Temporary buffer that is needed if field name is accessed
      * using {@link #getTextCharacters} method (instead of String
      * returning alternatives)
@@ -250,6 +255,7 @@ public abstract class ParserBase extends ParserMinimalBase
     protected ParserBase(IOContext ctxt, int features) {
         super(features);
         _ioContext = ctxt;
+        _streamReadConstraints = ctxt.streamReadConstraints();
         _textBuffer = ctxt.constructTextBuffer();
         DupDetector dups = Feature.STRICT_DUPLICATE_DETECTION.enabledIn(features)
                 ? DupDetector.rootDetector(this) : null;
@@ -1407,6 +1413,16 @@ public abstract class ParserBase extends ParserMinimalBase
 
     // Can't declare as deprecated, for now, but shouldn't be needed
     protected void _finishString() throws IOException { }
+
+    protected final void createChildArrayContext(final int lineNr, final int colNr) throws IOException {
+        _parsingContext = _parsingContext.createChildArrayContext(lineNr, colNr);
+        _streamReadConstraints.validateNestingDepth(_parsingContext.getNestingDepth());
+    }
+
+    protected final void createChildObjectContext(final int lineNr, final int colNr) throws IOException {
+        _parsingContext = _parsingContext.createChildObjectContext(lineNr, colNr);
+        _streamReadConstraints.validateNestingDepth(_parsingContext.getNestingDepth());
+    }
 
     protected int getMaxNumLen() {
         return _ioContext.streamReadConstraints().getMaxNumberLength();
