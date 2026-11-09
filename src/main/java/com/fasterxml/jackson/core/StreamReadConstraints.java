@@ -85,4 +85,38 @@ public class StreamReadConstraints {
                     depth, _maxNestingDepth));
         }
     }
+
+    /**
+     * Convenience method that can be used to verify that an integer
+     * number length does not exceed the maximum specified by this
+     * constraints object.
+     *
+     * @param length the integer number length
+     * @throws StreamConstraintsException if length exceeds maximum
+     */
+    public void validateIntegerLength(int length) throws StreamConstraintsException
+    {
+        if (length > _maxNumLen) {
+            throw new StreamConstraintsException(
+                String.format("Number value length (%d) exceeds the maximum allowed (%d)",
+                    length, _maxNumLen));
+        }
+    }
+
+    /**
+     * Convenience method that can be used to verify that a floating-point
+     * number length does not exceed the maximum specified by this
+     * constraints object.
+     *
+     * @param length the floating-point number length
+     * @throws StreamConstraintsException if length exceeds maximum
+     */
+    public void validateFPLength(int length) throws StreamConstraintsException
+    {
+        if (length > _maxNumLen) {
+            throw new StreamConstraintsException(
+                String.format("Number value length (%d) exceeds the maximum allowed (%d)",
+                    length, _maxNumLen));
+        }
+    }
 }
